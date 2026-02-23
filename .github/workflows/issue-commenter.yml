@@ -1,4 +1,4 @@
-name: Automated Issue Comments
+name: Issue Label Commenter
 
 on:
   issues:
@@ -7,28 +7,19 @@ on:
 jobs:
   comment-on-label:
     runs-on: ubuntu-latest
-    if: github.event.label.name == 'documentation' || github.event.label.name == 'wontfix'
+    permissions:
+      issues: write
     steps:
       - name: Comment on documentation label
         if: github.event.label.name == 'documentation'
-        uses: actions/github-script@v6
+        uses: peter-evans/create-or-update-comment@v3
         with:
-          script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: 'Thank you for flagging this documentation issue. We will update it soon.'
-            })
-
+          issue-number: ${{ github.event.issue.number }}
+          body: "Thank you for flagging this documentation issue. We will update it soon."
+          
       - name: Comment on wontfix label
         if: github.event.label.name == 'wontfix'
-        uses: actions/github-script@v6
+        uses: peter-evans/create-or-update-comment@v3
         with:
-          script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: 'After review, we have decided not to address this issue at this time.'
-            })
+          issue-number: ${{ github.event.issue.number }}
+          body: "After review, we have decided not to address this issue at this time."
